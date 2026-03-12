@@ -106,7 +106,7 @@ div.innerHTML=`
 ${c.name.common}
 `;
 
-div.onclick=()=>showCard(c);
+div.onclick=()=>showCard(c, li);
 
 container.appendChild(div);
 
@@ -114,7 +114,7 @@ container.appendChild(div);
 
 }
 
-function showCard(c){
+function showCard(c, element){
 
 const nameES =
 c.translations?.spa?.common ||
@@ -140,7 +140,7 @@ c.languages
 ? Object.values(c.languages).join(", ")
 : "—";
 
-document.getElementById("card").innerHTML = `
+const cardHTML = `
 
 <div class="card">
 
@@ -149,9 +149,7 @@ document.getElementById("card").innerHTML = `
 <h2>${nameES}</h2>
 
 <p><b>Capital:</b> ${capital}</p>
-
 <p><b>Población:</b> ${population}</p>
-
 <p><b>Región:</b> ${c.region}</p>
 <p><b>Moneda:</b> ${moneda}</p>
 <p><b>Idioma:</b> ${idioma}</p>
@@ -159,6 +157,11 @@ document.getElementById("card").innerHTML = `
 </div>
 
 `;
+
+let oldCard=document.querySelector(".card");
+if(oldCard) oldCard.remove();
+
+element.insertAdjacentHTML("afterend",cardHTML);
 
 }
 
