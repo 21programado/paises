@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Países</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body{
+font-family:system-ui;
+margin:0;
+padding:20px;
+background:#f2f2f2;
+max-width:700px;
+margin:auto;
+}
+
+h1{
+margin-top:0;
+}
+
+input{
+width:100%;
+padding:10px;
+font-size:16px;
+margin-bottom:20px;
+}
+
+.region{
+margin-top:20px;
+font-weight:bold;
+}
+
+.country{
+background:white;
+padding:8px;
+margin:4px 0;
+border-radius:6px;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.country img{
+width:28px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Países</h1>
+
+<input id="search" placeholder="Buscar país...">
+
+<div id="list"></div>
+
+<script>
+
+const url="https://restcountries.com/v3.1/all?fields=name,region,flags";
+
+let countries=[];
+
+fetch(url)
+.then(r=>r.json())
+.then(data=>{
+countries=data.sort((a,b)=>
+a.name.common.localeCompare(b.name.common));
+render(countries);
+});
+
+function render(data){
+
+const regions={};
+
+data.forEach(c=>{
+if(!regions[c.region]) regions[c.region]=[];
+regions[c.region].push(c);
+});
+
+const container=document.getElementById("list");
+container.innerHTML="";
+
+Object.keys(regions).sort().forEach(region=>{
+
+const r=document.createElement("div");
+r.className="region";
+r.textContent=region;
+
+container.appendChild(r);
+
+regions[region].forEach(c=>{
+
+const div=document.createElement("div");
+div.className="country";
+
+div.innerHTML=`
+<input type="checkbox">
+<img src="${c.flags.png}">
+${c.name.common}
+`;
+
+container.appendChild(div);
+
+});
+
+});
+
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+
+const q=e.target.value.toLowerCase();
+
+const filtered=countries.filter(c=>
+c.name.common.toLowerCase().includes(q));
+
+render(filtered);
+
+});
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+
+</script>
+
+</body>
+</html>
