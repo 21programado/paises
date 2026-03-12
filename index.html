@@ -67,13 +67,13 @@ width:120px;
 
 <input id="search" placeholder="Buscar país...">
 
-<div id="list"></div>
-
 <div id="card"></div>
+
+<div id="list"></div>
 
 <script>
 
-const url="https://restcountries.com/v3.1/lang/spanish";
+const url = "https://restcountries.com/v3.1/all?fields=name,capital,population,region,flags,currencies,languages,translations";
 
 let countries=[];
 
@@ -116,25 +116,45 @@ container.appendChild(div);
 
 function showCard(c){
 
-const capital=c.capital ? c.capital[0] : "—";
+const nameES =
+c.translations?.spa?.common ||
+c.name.common;
 
-const population=c.population
+const capital =
+c.capital && c.capital.length
+? c.capital[0]
+: "—";
+
+const population =
+c.population
 ? c.population.toLocaleString()
 : "—";
 
-document.getElementById("card").innerHTML=`
+const moneda =
+c.currencies
+? Object.values(c.currencies)[0].name
+: "—";
+
+const idioma =
+c.languages
+? Object.values(c.languages).join(", ")
+: "—";
+
+document.getElementById("card").innerHTML = `
 
 <div class="card">
 
 <img src="${c.flags.png}">
 
-<h2>${c.name.common}</h2>
+<h2>${nameES}</h2>
 
 <p><b>Capital:</b> ${capital}</p>
 
 <p><b>Población:</b> ${population}</p>
 
 <p><b>Región:</b> ${c.region}</p>
+<p><b>Moneda:</b> ${moneda}</p>
+<p><b>Idioma:</b> ${idioma}</p>
 
 </div>
 
