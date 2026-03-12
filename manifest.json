@@ -1,10 +1,10 @@
 {
-"name": "Países del Mundo",
-"short_name": "Países",
-"start_url": "./",
-"display": "standalone",
-"background_color": "#ffffff",
-"theme_color": "#ffffff",
+"name":"Países",
+"short_name":"Países",
+"start_url":"./",
+"display":"standalone",
+"background_color":"#ffffff",
+"theme_color":"#ffffff",
 "icons":[
 {
 "src":"icon-192.png",

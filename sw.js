@@ -1,4 +1,4 @@
-const CACHE="paises-v2";
+const CACHE="paises-v1";
 
 const FILES=[
 "./",

@@ -21,11 +21,9 @@ max-width:700px;
 margin:auto;
 }
 
-h1{
-margin-top:0;
-}
+h1{margin-top:0;}
 
-input[type="text"]{
+#search{
 width:100%;
 padding:10px;
 font-size:16px;
@@ -33,15 +31,10 @@ margin-bottom:20px;
 box-sizing:border-box;
 }
 
-.region{
-margin-top:20px;
-font-weight:bold;
-}
-
 .country{
 background:white;
-padding:8px;
-margin:4px 0;
+padding:10px;
+margin:6px 0;
 border-radius:6px;
 display:flex;
 align-items:center;
@@ -50,49 +43,18 @@ cursor:pointer;
 }
 
 .country img{
-width:28px;
-}
-
-.checkbox{
-cursor:pointer;
+width:30px;
 }
 
 .card{
-
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.4);
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-}
-
-.card-content{
-
+margin-top:20px;
 background:white;
-padding:20px;
+padding:15px;
 border-radius:10px;
-max-width:350px;
-width:90%;
-text-align:center;
-
 }
 
-.card-content img{
+.card img{
 width:120px;
-}
-
-.close{
-
-margin-top:15px;
-padding:8px 12px;
-border:none;
-background:#eee;
-border-radius:6px;
-cursor:pointer;
-
 }
 
 </style>
@@ -103,32 +65,25 @@ cursor:pointer;
 
 <h1>Países</h1>
 
-<input id="search" type="text" placeholder="Buscar país...">
+<input id="search" placeholder="Buscar país...">
 
 <div id="list"></div>
 
+<div id="card"></div>
+
 <script>
 
-const url="https://restcountries.com/v3.1/all?fields=name,region,capital,population,flags,translations";
+const url="https://restcountries.com/v3.1/lang/spanish";
 
 let countries=[];
-
-let selected = JSON.parse(localStorage.getItem("selectedCountries") || "{}");
 
 fetch(url)
 .then(r=>r.json())
 .then(data=>{
 
-countries=data.map(c=>{
-
-const nameES = c.translations?.spa?.common || c.name.common;
-
-return{
-...c,
-nameES
-};
-
-}).sort((a,b)=>a.nameES.localeCompare(b.nameES));
+countries=data.sort((a,b)=>
+a.name.common.localeCompare(b.name.common)
+);
 
 render(countries);
 
@@ -136,63 +91,24 @@ render(countries);
 
 function render(data){
 
-const regions={};
-
-data.forEach(c=>{
-
-if(!regions[c.region]) regions[c.region]=[];
-
-regions[c.region].push(c);
-
-});
-
 const container=document.getElementById("list");
 
 container.innerHTML="";
 
-Object.keys(regions).sort().forEach(region=>{
-
-const r=document.createElement("div");
-
-r.className="region";
-
-r.textContent=region;
-
-container.appendChild(r);
-
-regions[region].forEach(c=>{
+data.forEach(c=>{
 
 const div=document.createElement("div");
 
 div.className="country";
 
 div.innerHTML=`
-<input class="checkbox" type="checkbox" ${selected[c.nameES] ? "checked" : ""}>
 <img src="${c.flags.png}">
-${c.nameES}
+${c.name.common}
 `;
 
-const checkbox=div.querySelector("input");
-
-checkbox.addEventListener("click",(e)=>{
-
-e.stopPropagation();
-
-if(checkbox.checked){
-selected[c.nameES]=true;
-}else{
-delete selected[c.nameES];
-}
-
-localStorage.setItem("selectedCountries",JSON.stringify(selected));
-
-});
-
-div.addEventListener("click",()=>showCard(c));
+div.onclick=()=>showCard(c);
 
 container.appendChild(div);
-
-});
 
 });
 
@@ -202,35 +118,27 @@ function showCard(c){
 
 const capital=c.capital ? c.capital[0] : "—";
 
-const pop=c.population ? c.population.toLocaleString() : "—";
+const population=c.population
+? c.population.toLocaleString()
+: "—";
 
-const card=document.createElement("div");
+document.getElementById("card").innerHTML=`
 
-card.className="card";
-
-card.innerHTML=`
-
-<div class="card-content">
+<div class="card">
 
 <img src="${c.flags.png}">
 
-<h2>${c.nameES}</h2>
+<h2>${c.name.common}</h2>
 
 <p><b>Capital:</b> ${capital}</p>
 
-<p><b>Población:</b> ${pop}</p>
+<p><b>Población:</b> ${population}</p>
 
 <p><b>Región:</b> ${c.region}</p>
-
-<button class="close">Cerrar</button>
 
 </div>
 
 `;
-
-card.querySelector(".close").onclick=()=>card.remove();
-
-document.body.appendChild(card);
 
 }
 
@@ -239,7 +147,7 @@ document.getElementById("search").addEventListener("input",e=>{
 const q=e.target.value.toLowerCase();
 
 const filtered=countries.filter(c=>
-c.nameES.toLowerCase().includes(q)
+c.name.common.toLowerCase().includes(q)
 );
 
 render(filtered);
@@ -247,9 +155,7 @@ render(filtered);
 });
 
 if("serviceWorker" in navigator){
-
 navigator.serviceWorker.register("sw.js");
-
 }
 
 </script>
